@@ -3,6 +3,37 @@
 ## Display Testing Results
 **Display Name:** 2.4inch 320x240 TFT LCD Display Module ILI9341 Resistive Touchscreen 8-bit Parallel Interface SD Card Slot for Arduino - AliExpress
 Using `graphictest_kbv.ino` had by far the best performance compared to other display libraries. Everything was drawn very quickly. 
+
+## UART Comms
+Example ESP8266 Send: `HIGH:82,LOW:72,TEMP:74,RAIN:15,HUM:47,TIME:10:15 AM,DATE:Monday - Jan 17th,DATETXT:1/17/2025,CLOUD:clear\n`
+
+### Tesing UART RX:
+Formatted input and output test:
+```
+---- Sent utf8 encoded message: "HIGH:82,LOW:72,TEMP:74,RAIN:15,HUM:47,TIME:10:15 AM,DATE:Monday - Jan 17th,DATETXT:1/17/2025,CLOUD:clear\n" ----
+--- Weather Data ---
+TempHIGH_text: 82
+TempLOW_text: 72
+CurrentTEMP_text: 74
+Chance_of_Rain_Number_text: 15%
+Humidity_Number_text: 47%
+Time_text: 10:15 AM
+Week_Month_Day_text: Monday - Jan 17th
+Date_text: 1/17/2025
+--------------------
+---- Sent utf8 encoded message: "HIGH:115,LOW:-15,TEMP:54,RAIN:100,HUM:100,TIME:12:34 PM,DATE:Saturday - Feb 21st,DATETXT:12/11/2029,CLOUD:overcast\n" ----
+--- Weather Data ---
+TempHIGH_text: 115
+TempLOW_text: -15
+CurrentTEMP_text: 54
+Chance_of_Rain_Number_text: 100%
+Humidity_Number_text: 100%
+Time_text: 12:34 PM
+Week_Month_Day_text: Saturday - Feb 21st
+Date_text: 12/11/2029
+--------------------
+```
+
 ### Touchscreen Calibration
 From `MCUFRIEND_kbv`->`TouchScreen_Calibr_native`
 ```

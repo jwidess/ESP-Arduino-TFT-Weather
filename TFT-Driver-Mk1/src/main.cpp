@@ -9,75 +9,68 @@
 #include <Adafruit_GFX.h>
 #include <MCUFRIEND_kbv.h>
 MCUFRIEND_kbv tft;
-#include <TouchScreen.h>
-#include <SPI.h>
 #include "bitmaps.h"
+#include <SPI.h>
+// #include <TouchScreen.h>
 
 #define MINPRESSURE 200
 #define MAXPRESSURE 1000
 
 // Assign human-readable names to some common 16-bit color values:
-#define BLACK 0x0000
-#define BLUE 0x001F
-#define RED 0xF800
-#define GREEN 0x07E0
-#define CYAN 0x07FF
+#define BLACK   0x0000
+#define BLUE    0x001F
+#define RED     0xF800
+#define GREEN   0x07E0
+#define CYAN    0x07FF
 #define MAGENTA 0xF81F
-#define YELLOW 0xFFE0
-#define WHITE 0xFFFF
+#define YELLOW  0xFFE0
+#define WHITE   0xFFFF
 
 // ALL Touch panels and wiring is DIFFERENT
 // char *name = "2.4 TFT ILI9341";
 
 // From calibration on 6/28/2025
-const int XP = 8, XM = A2, YP = A3, YM = 9; // 240x320 ID=0x9341
-const int TS_LEFT = 155, TS_RT = 856, TS_TOP = 90, TS_BOT = 845;
-TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
+// const int   XP = 8, XM = A2, YP = A3, YM = 9; // 240x320 ID=0x9341
+// const int   TS_LEFT = 155, TS_RT = 856, TS_TOP = 90, TS_BOT = 845;
+// TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
 
-int pixel_x, pixel_y; // Touch_getXY() updates global vars
-bool Touch_getXY(void)
-{
-  TSPoint p = ts.getPoint();
-  pinMode(YP, OUTPUT); // restore shared pins
-  pinMode(XM, OUTPUT);
-  digitalWrite(YP, HIGH); // because TFT control pins
-  digitalWrite(XM, HIGH);
-  bool pressed = (p.z > MINPRESSURE && p.z < MAXPRESSURE);
-  if (pressed)
-  {
-    pixel_x = map(p.x, TS_LEFT, TS_RT, 0, tft.width()); //.kbv makes sense to me
-    pixel_y = map(p.y, TS_TOP, TS_BOT, 0, tft.height());
-  }
-  return pressed;
-}
+// int  pixel_x, pixel_y; // Touch_getXY() updates global vars
+// bool Touch_getXY(void) {
+//   TSPoint p = ts.getPoint();
+//   pinMode(YP, OUTPUT); // restore shared pins
+//   pinMode(XM, OUTPUT);
+//   digitalWrite(YP, HIGH); // because TFT control pins
+//   digitalWrite(XM, HIGH);
+//   bool pressed = (p.z > MINPRESSURE && p.z < MAXPRESSURE);
+//   if (pressed) {
+//     pixel_x = map(p.x, TS_LEFT, TS_RT, 0, tft.width()); //.kbv makes sense to me
+//     pixel_y = map(p.y, TS_TOP, TS_BOT, 0, tft.height());
+//   }
+//   return pressed;
+// }
 
-// Example weather data (replace with real data later)
-float temperature = 23.5; // Celsius
-int cloudCover = 75;      // Percent
-int humidity = 60;        // Percent
-String windDir = "NE";    // Wind direction
+String cloudDesc = "Partly Cloudy";
 
-// Lopaka UI text variables (updated names)
-const char *TempHIGH_text = "82F";
-const char *TempLOW_text = "72F";
-const char *CurrentTEMP_text = "74F";
-const char *Chance_of_Rain_Number_text = "4%";
-const char *Humidity_Number_text = "5%";
-const char *Time_text = "10:15 AM";
-const char *Week_Month_Day_text = "Monday - Jan 17th";
-const char *Date_text = "1/17/2025";
+// Lopaka UI text variables
+const char *TempHIGH_text              = "HIGH";
+const char *TempLOW_text               = "LOW";
+const char *CurrentTEMP_text           = "CRNT";
+const char *Chance_of_Rain_Number_text = "RAIN";
+const char *Humidity_Number_text       = "HUMID";
+const char *Time_text                  = "TIME";
+const char *Week_Month_Day_text        = "WEEK";
+const char *Date_text                  = "DATE";
 
 // Draw text centered horizontally on the display
 // @param text      The string to print
 // @param y         The y position (top of text)
 // @param textSize  The text size (as used by setTextSize)
 // @param color     The 16-bit color value
-void drawTextCentered(const char *text, int y, int textSize, uint16_t color)
-{
+void drawTextCentered(const char *text, int y, int textSize, uint16_t color) {
   tft.setTextSize(textSize);
-  int len = strlen(text);
+  int len       = strlen(text);
   int textWidth = len * 6 * textSize;
-  int x = (240 - textWidth) / 2;
+  int x         = (240 - textWidth) / 2;
   tft.setTextColor(color);
   tft.setCursor(x, y);
   tft.print(text);
@@ -89,22 +82,16 @@ void drawTextCentered(const char *text, int y, int textSize, uint16_t color)
 // @param textSize  The text size (as used by setTextSize)
 // @param color     The 16-bit color value
 // @param align     Alignment: "left", "right", or "center"
-void drawTextAligned(const char *text, int y, int textSize, uint16_t color, const char *align)
-{
+void drawTextAligned(const char *text, int y, int textSize, uint16_t color, const char *align) {
   tft.setTextSize(textSize);
-  int len = strlen(text);
+  int len       = strlen(text);
   int textWidth = len * 6 * textSize;
-  int x = 0;
-  if (strcmp(align, "left") == 0)
-  {
+  int x         = 0;
+  if (strcmp(align, "left") == 0) {
     x = 0;
-  }
-  else if (strcmp(align, "right") == 0)
-  {
+  } else if (strcmp(align, "right") == 0) {
     x = 240 - textWidth;
-  }
-  else if (strcmp(align, "center") == 0)
-  {
+  } else if (strcmp(align, "center") == 0) {
     x = (240 - textWidth) / 2;
   }
   tft.setTextColor(color);
@@ -112,8 +99,8 @@ void drawTextAligned(const char *text, int y, int textSize, uint16_t color, cons
   tft.print(text);
 }
 
-void drawWeatherUI()
-{
+void drawWeatherUI() {
+  tft.fillScreen(BLACK);
   // Outline
   tft.drawRect(0, 0, 240, 320, 0xF206);
 
@@ -123,7 +110,7 @@ void drawWeatherUI()
   // TempHIGH (right aligned, 5px padding)
   tft.setTextColor(0xF206);
   tft.setTextSize(5);
-  int tempHighLen = strlen(TempHIGH_text);
+  int tempHighLen   = strlen(TempHIGH_text);
   int tempHighWidth = tempHighLen * 6 * 5;
   tft.setCursor(240 - tempHighWidth, 10);
   tft.print(TempHIGH_text);
@@ -131,7 +118,7 @@ void drawWeatherUI()
   // TempLOW (right aligned, 5px padding)
   tft.setTextColor(0x55E);
   tft.setTextSize(5);
-  int tempLowLen = strlen(TempLOW_text);
+  int tempLowLen   = strlen(TempLOW_text);
   int tempLowWidth = tempLowLen * 6 * 5;
   tft.setCursor(240 - tempLowWidth, 57);
   tft.print(TempLOW_text);
@@ -140,10 +127,6 @@ void drawWeatherUI()
   tft.drawLine(5, 104, 234, 104, WHITE);
 
   // CurrentTEMP
-  // tft.setTextColor(WHITE);
-  // tft.setTextSize(7);
-  // tft.setCursor(61, 115);
-  // tft.print(CurrentTEMP_text);
   drawTextCentered(CurrentTEMP_text, 115, 7, WHITE);
 
   // Below Temp Divider
@@ -159,12 +142,12 @@ void drawWeatherUI()
 
   // Chance of Rain Symbol and Number (right-aligned together)
   tft.setTextSize(3);
-  int rainNumLen = strlen(Chance_of_Rain_Number_text);
-  int rainNumWidth = rainNumLen * 6 * 3;
-  int rainNumRight = 235; // right edge for both symbol and text
-  int rainNumX = rainNumRight - rainNumWidth;
-  int rainIconWidth = 30;                       // width of the bitmap
-  int rainIconX = rainNumX - rainIconWidth - 7; // 7px spacing
+  int rainNumLen    = strlen(Chance_of_Rain_Number_text);
+  int rainNumWidth  = rainNumLen * 6 * 3;
+  int rainNumRight  = 235; // right edge for both symbol and text
+  int rainNumX      = rainNumRight - rainNumWidth;
+  int rainIconWidth = 30;                           // width of the bitmap
+  int rainIconX     = rainNumX - rainIconWidth - 7; // 7px spacing
   tft.drawBitmap(rainIconX, 177, image_Chance_of_Rain_Symbol_bits, rainIconWidth, 32, WHITE);
   tft.setCursor(rainNumX, 183);
   tft.setTextColor(WHITE);
@@ -187,22 +170,103 @@ void drawWeatherUI()
   tft.setTextWrap(false);
 }
 
-void setup(void)
-{
+// Parse UART weather data and update display variables
+void parseWeatherData(const String &input) {
+  int    idx  = 0;
+  String data = input;
+  data.trim();
+  while (idx < data.length()) {
+    int    sep   = data.indexOf(',', idx);
+    String pair  = (sep == -1) ? data.substring(idx) : data.substring(idx, sep);
+    int    colon = pair.indexOf(':');
+    if (colon > 0) {
+      String key   = pair.substring(0, colon);
+      String value = pair.substring(colon + 1);
+      value.trim();
+      if (key == "HIGH") {
+        static char buf[8];
+        value.toCharArray(buf, sizeof(buf));
+        TempHIGH_text = strdup(buf);
+      } else if (key == "LOW") {
+        static char buf[8];
+        value.toCharArray(buf, sizeof(buf));
+        TempLOW_text = strdup(buf);
+      } else if (key == "TEMP") {
+        static char buf[8];
+        value.toCharArray(buf, sizeof(buf));
+        CurrentTEMP_text = strdup(buf);
+      } else if (key == "RAIN") {
+        static char buf[8];
+        snprintf(buf, sizeof(buf), "%s%%", value.c_str());
+        Chance_of_Rain_Number_text = strdup(buf);
+      } else if (key == "HUM") {
+        static char buf[8];
+        snprintf(buf, sizeof(buf), "%s%%", value.c_str());
+        Humidity_Number_text = strdup(buf);
+      } else if (key == "TIME") {
+        static char buf[16];
+        value.toCharArray(buf, sizeof(buf));
+        Time_text = strdup(buf);
+      } else if (key == "DATE") {
+        static char buf[32];
+        value.toCharArray(buf, sizeof(buf));
+        Week_Month_Day_text = strdup(buf);
+      } else if (key == "DATETXT") {
+        static char buf[16];
+        value.toCharArray(buf, sizeof(buf));
+        Date_text = strdup(buf);
+      } else if (key == "CLOUD") {
+        cloudDesc = value;
+      }
+    }
+    if (sep == -1) break;
+    idx = sep + 1;
+  }
+  // Print formatted values for debugging
+  Serial.println("--- Weather Data ---");
+  Serial.print("TempHIGH_text: ");
+  Serial.println(TempHIGH_text);
+  Serial.print("TempLOW_text: ");
+  Serial.println(TempLOW_text);
+  Serial.print("CurrentTEMP_text: ");
+  Serial.println(CurrentTEMP_text);
+  Serial.print("Chance_of_Rain_Number_text: ");
+  Serial.println(Chance_of_Rain_Number_text);
+  Serial.print("Humidity_Number_text: ");
+  Serial.println(Humidity_Number_text);
+  Serial.print("Time_text: ");
+  Serial.println(Time_text);
+  Serial.print("Week_Month_Day_text: ");
+  Serial.println(Week_Month_Day_text);
+  Serial.print("Date_text: ");
+  Serial.println(Date_text);
+  Serial.print("cloudDesc: ");
+  Serial.println(cloudDesc);
+  Serial.println("--------------------");
+}
+
+void setup(void) {
   Serial.begin(9600);
   uint16_t ID = tft.readID();
   Serial.print("TFT ID = 0x");
   Serial.println(ID, HEX);
-  if (ID == 0xD3D3)
-    ID = 0x9486; // write-only shield
+  if (ID == 0xD3D3) ID = 0x9486; // write-only shield
   tft.begin(ID);
   tft.setRotation(0); // PORTRAIT
   tft.fillScreen(BLACK);
   drawWeatherUI();
 }
 
-void loop(void)
-{
-  delay(1000); // Adjust delay as needed
-  drawWeatherUI();
+void loop(void) {
+  static String input = "";
+  while (Serial.available()) {
+    char c = Serial.read();
+    if (c == '\n') {
+      parseWeatherData(input);
+      drawWeatherUI();
+      input = "";
+    } else {
+      input += c;
+    }
+  }
 }
