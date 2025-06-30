@@ -52,14 +52,14 @@ MCUFRIEND_kbv tft;
 String cloudDesc = "Partly Cloudy";
 
 // Lopaka UI text variables
-const char *TempHIGH_text              = "HIGH";
-const char *TempLOW_text               = "LOW";
-const char *CurrentTEMP_text           = "CRNT";
-const char *Chance_of_Rain_Number_text = "RAIN";
-const char *Humidity_Number_text       = "HUMID";
-const char *Time_text                  = "TIME";
-const char *Week_Month_Day_text        = "WEEK";
-const char *Date_text                  = "DATE";
+char TempHIGH_text[8]              = "HIGH";
+char TempLOW_text[8]               = "LOW";
+char CurrentTEMP_text[8]           = "CRNT";
+char Chance_of_Rain_Number_text[8] = "RAIN";
+char Humidity_Number_text[8]       = "HUMID";
+char Time_text[16]                 = "TIME";
+char Week_Month_Day_text[32]       = "WEEK";
+char Date_text[16]                 = "DATE";
 
 // Draw text centered horizontally on the display
 // @param text      The string to print
@@ -184,37 +184,21 @@ void parseWeatherData(const String &input) {
       String value = pair.substring(colon + 1);
       value.trim();
       if (key == "HIGH") {
-        static char buf[8];
-        value.toCharArray(buf, sizeof(buf));
-        TempHIGH_text = strdup(buf);
+        value.toCharArray(TempHIGH_text, sizeof(TempHIGH_text));
       } else if (key == "LOW") {
-        static char buf[8];
-        value.toCharArray(buf, sizeof(buf));
-        TempLOW_text = strdup(buf);
+        value.toCharArray(TempLOW_text, sizeof(TempLOW_text));
       } else if (key == "TEMP") {
-        static char buf[8];
-        value.toCharArray(buf, sizeof(buf));
-        CurrentTEMP_text = strdup(buf);
+        value.toCharArray(CurrentTEMP_text, sizeof(CurrentTEMP_text));
       } else if (key == "RAIN") {
-        static char buf[8];
-        snprintf(buf, sizeof(buf), "%s%%", value.c_str());
-        Chance_of_Rain_Number_text = strdup(buf);
+        snprintf(Chance_of_Rain_Number_text, sizeof(Chance_of_Rain_Number_text), "%s%%", value.c_str());
       } else if (key == "HUM") {
-        static char buf[8];
-        snprintf(buf, sizeof(buf), "%s%%", value.c_str());
-        Humidity_Number_text = strdup(buf);
+        snprintf(Humidity_Number_text, sizeof(Humidity_Number_text), "%s%%", value.c_str());
       } else if (key == "TIME") {
-        static char buf[16];
-        value.toCharArray(buf, sizeof(buf));
-        Time_text = strdup(buf);
+        value.toCharArray(Time_text, sizeof(Time_text));
       } else if (key == "DATE") {
-        static char buf[32];
-        value.toCharArray(buf, sizeof(buf));
-        Week_Month_Day_text = strdup(buf);
+        value.toCharArray(Week_Month_Day_text, sizeof(Week_Month_Day_text));
       } else if (key == "DATETXT") {
-        static char buf[16];
-        value.toCharArray(buf, sizeof(buf));
-        Date_text = strdup(buf);
+        value.toCharArray(Date_text, sizeof(Date_text));
       } else if (key == "CLOUD") {
         cloudDesc = value;
       }
