@@ -61,6 +61,10 @@ char Time_text[16]                 = "TIME";
 char Week_Month_Day_text[32]       = "WEEK";
 char Date_text[16]                 = "DATE";
 
+// Track last UART RX time. If no UART message is received after 2 minutes, set Time_text to ERROR and raise flag
+unsigned long lastUartRx      = 0;
+bool          uartTimeoutFlag = false;
+
 // Draw text centered horizontally on the display
 // @param text      The string to print
 // @param y         The y position (top of text)
@@ -172,6 +176,8 @@ void drawWeatherUI() {
 
 // Parse UART weather data and update display variables
 void parseWeatherData(const String &input) {
+  lastUartRx = millis();
+
   int    idx  = 0;
   String data = input;
   data.trim();
@@ -194,6 +200,7 @@ void parseWeatherData(const String &input) {
       } else if (key == "HUM") {
         snprintf(Humidity_Number_text, sizeof(Humidity_Number_text), "%s%%", value.c_str());
       } else if (key == "TIME") {
+        uartTimeoutFlag = false;
         value.toCharArray(Time_text, sizeof(Time_text));
       } else if (key == "DATE") {
         value.toCharArray(Week_Month_Day_text, sizeof(Week_Month_Day_text));
@@ -206,6 +213,9 @@ void parseWeatherData(const String &input) {
     if (sep == -1) break;
     idx = sep + 1;
   }
+  Serial.println("--- UART RX Payload ---");
+  Serial.println(input);
+  Serial.println("-----------------------");
   // Print formatted values for debugging
   Serial.println("--- Weather Data ---");
   Serial.print("TempHIGH_text: ");
@@ -251,6 +261,14 @@ void loop(void) {
       input = "";
     } else {
       input += c;
+    }
+  }
+  // Check for UART timeout (no message in over 2 minutes)
+  if (millis() - lastUartRx > 120000UL) {
+    if (!uartTimeoutFlag) {
+      strncpy(Time_text, "ERROR", sizeof(Time_text));
+      uartTimeoutFlag = true;
+      drawWeatherUI();
     }
   }
 }
