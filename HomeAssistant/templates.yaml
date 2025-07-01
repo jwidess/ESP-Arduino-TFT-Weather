@@ -1,0 +1,83 @@
+# This file contains Home Assistant templates to create the sensors and triggers for weather data.
+- sensor:
+    - name: "UART Weather Payload"
+      unique_id: uart_weather_payload
+      state: >-
+        {{
+          "HIGH:" ~ (states('sensor.forecast_today_temperature') if states('sensor.forecast_today_temperature') not in ['unavailable', 'unknown'] else '0') ~
+          ",LOW:" ~ (states('sensor.forecast_today_low_temperature') if states('sensor.forecast_today_low_temperature') not in ['unavailable', 'unknown'] else '0') ~
+          ",TEMP:" ~ (state_attr('weather.forecast_home', 'temperature') | int) ~
+          ",RAIN:" ~ ((states('sensor.forecast_today_precipitation_probability') | float(0)) | round(0) | int) ~
+          ",HUM:" ~ (state_attr('weather.forecast_home', 'humidity') | int) ~
+          ",TIME:" ~ now().strftime('%-I:%M %p') ~
+          ",DATE:" ~ now().strftime('%A - %b %-d') ~
+          ",DATETXT:" ~ now().strftime('%-m/%-d/%Y') ~
+          ",CLOUD:" ~ (states('sensor.forecast_today_condition') if states('sensor.forecast_today_condition') not in ['unavailable', 'unknown'] else 'clear')
+        }}
+
+# Below trigger credit to rossc719: https://community.home-assistant.io/t/i-just-want-todays-high-temp/758604/5?u=jwidess
+# Uses PirateWeather integration to get daily forecasts
+- trigger:
+    - platform: time_pattern
+      hours: /1
+    - platform: homeassistant
+      event: start
+    - platform: event
+      event_type: event_template_reloaded
+  action:
+    - action: weather.get_forecasts
+      data:
+        type: daily
+      target:
+        entity_id: weather.pirateweather
+      response_variable: daily
+  sensor:
+    - name: Forecast Today Condition
+      unique_id: forecast_today_condition
+      state: "{{ daily['weather.pirateweather'].forecast[0].condition }}"
+      icon: mdi:weather-partly-rainy
+    - name: Forecast Today Temperature
+      unique_id: forecast_today_temperature
+      state: "{{ daily['weather.pirateweather'].forecast[0].temperature }}"
+      unit_of_measurement: °F
+      device_class: temperature
+    - name: Forecast Today Low Temperature
+      unique_id: forecast_today_low_temp
+      state: "{{ daily['weather.pirateweather'].forecast[0].templow }}"
+      unit_of_measurement: °F
+      device_class: temperature
+    - name: Forecast Today Humidity
+      unique_id: forecast_today_humidity
+      state: "{{ daily['weather.pirateweather'].forecast[0].humidity }}"
+      unit_of_measurement: "%"
+      device_class: humidity
+    - name: Forecast Today Cloud Cover
+      unique_id: forecast_today_cloud_cover
+      state: "{{ daily['weather.pirateweather'].forecast[0].cloud_coverage }}"
+      unit_of_measurement: "%"
+      icon: mdi:cloud
+    - name: Forecast Today Precipitation Probability
+      unique_id: forecast_today_precipitation_probability
+      state: "{{ daily['weather.pirateweather'].forecast[0].precipitation_probability }}"
+      unit_of_measurement: "%"
+      icon: mdi:water-percent
+    - name: Forecast Today Precipitation
+      unique_id: forecast_today_precipitation
+      state: "{{ daily['weather.pirateweather'].forecast[0].precipitation }}"
+      unit_of_measurement: in
+      icon: mdi:water
+    - name: Forecast Today Wind Bearing
+      unique_id: forecast_today_wind_bearing
+      state: "{{ daily['weather.pirateweather'].forecast[0].wind_bearing }}"
+      unit_of_measurement: °
+      icon: mdi:compass
+    - name: Forecast Today Wind Speed
+      unique_id: forecast_today_wind_speed
+      state: "{{ daily['weather.pirateweather'].forecast[0].wind_speed }}"
+      unit_of_measurement: mph
+      icon: mdi:weather-windy
+    - name: Forecast Today Wind Gust Speed
+      unique_id: forecast_today_wind_gust_speed
+      state: "{{ daily['weather.pirateweather'].forecast[0].wind_gust_speed }}"
+      unit_of_measurement: mph
+      icon: mdi:weather-windy
