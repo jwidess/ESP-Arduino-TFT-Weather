@@ -49,6 +49,13 @@ MCUFRIEND_kbv tft;
 //   return pressed;
 // }
 
+// Function prototypes
+void drawTextCentered(const char *text, int y, int textSize, uint16_t color);
+void drawTextAligned(const char *text, int y, int textSize, uint16_t color, const char *align);
+void drawWeatherUI();
+void parseWeatherData(const String &input);
+void drawStatusIndicator();
+
 String cloudDesc = "Partly Cloudy";
 
 // Lopaka UI text variables
@@ -64,6 +71,9 @@ char Date_text[16]                 = "DATE";
 // Track last UART RX time. If no UART message is received after 2 minutes, set Time_text to ERROR and raise flag
 unsigned long lastUartRx      = 0;
 bool          uartTimeoutFlag = false;
+
+// Status indicator animation state
+uint8_t statusAnimIdx = 0;
 
 // Draw text centered horizontally on the display
 // @param text      The string to print
@@ -252,7 +262,8 @@ void setup(void) {
 }
 
 void loop(void) {
-  static String input = "";
+  static String        input          = "";
+  static unsigned long lastStatusAnim = 0;
   while (Serial.available()) {
     char c = Serial.read();
     if (c == '\n') {
@@ -271,4 +282,19 @@ void loop(void) {
       drawWeatherUI();
     }
   }
+  // Animate status indicator every 100ms
+  if (millis() - lastStatusAnim > 100) {
+    drawStatusIndicator();
+    lastStatusAnim = millis();
+  }
+}
+
+void drawStatusIndicator() {
+  // Classic spinner: "|", "/", "-", "\\":
+  static const char spinnerChars[4] = {'|', '/', '-', '\\'};
+  tft.setTextSize(1);
+  tft.setTextColor(WHITE, BLACK); // Draw white on black to erase previous
+  tft.setCursor(3, 310);          // Bottom left corner
+  tft.print(spinnerChars[statusAnimIdx % 4]);
+  statusAnimIdx = (statusAnimIdx + 1) % 4;
 }
