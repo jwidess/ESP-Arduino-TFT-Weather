@@ -6,9 +6,9 @@
         {{
           "HIGH:" ~ (states('sensor.forecast_today_temperature') if states('sensor.forecast_today_temperature') not in ['unavailable', 'unknown'] else '0') ~
           ",LOW:" ~ (states('sensor.forecast_today_low_temperature') if states('sensor.forecast_today_low_temperature') not in ['unavailable', 'unknown'] else '0') ~
-          ",TEMP:" ~ (state_attr('weather.forecast_home', 'temperature') | int) ~
+          ",TEMP:" ~ (state_attr('weather.pirateweather', 'temperature') | int) ~
           ",RAIN:" ~ ((states('sensor.forecast_today_precipitation_probability') | float(0)) | round(0) | int) ~
-          ",HUM:" ~ (state_attr('weather.forecast_home', 'humidity') | int) ~
+          ",HUM:" ~ (state_attr('weather.pirateweather', 'humidity') | int) ~
           ",TIME:" ~ now().strftime('%-I:%M %p') ~
           ",DATE:" ~ now().strftime('%A - %b %-d') ~
           ",DATETXT:" ~ now().strftime('%-m/%-d/%Y') ~
