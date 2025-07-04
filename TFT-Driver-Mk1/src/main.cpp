@@ -370,46 +370,40 @@ void drawTemperatureWithDegreeF(const char *tempStr, int x, int y, int textSize,
   tft.print('F');
 }
 
+// Struct for weather icon mapping
+struct WeatherIconMapping {
+  const char* keywords[6]; // Up to 5 keywords, null-terminated
+  const uint8_t* bitmap;
+  int x, y, w, h;
+};
+
+// Icon mappings table
+const WeatherIconMapping iconMappings[] = {
+  { {"rain", "rainy", "pouring", "hail", nullptr}, image_weather_raining_bits, 14, 10, 85, 80 },
+  { {"lightning", "lightning-rainy", "thunder", nullptr}, image_weather_lightning_bits, 12, 10, 90, 85 },
+  { {"snowy", "snowy-rainy", nullptr}, image_weather_snow_bits, 12, 6, 90, 96 },
+  { {"partlycloudy", "cloudy-sunny", nullptr}, image_weather_cloudy_sunny_bits, 12, 10, 85, 80 },
+  { {"cloudy", "fog", "windy", "windy-variant", nullptr}, image_weather_cloud_bits, 12, 20, 85, 80 },
+  { {"exceptional", "unknown", nullptr}, image_weather_exceptional_bits, 12, 6, 90, 90 },
+  { {"clear-night", "moon", "night", nullptr}, image_weather_moon_bits, 16, 15, 80, 80 },
+  { {"sunny", "clear", nullptr}, image_weather_sunny_bits, 12, 5, 90, 96 },
+  { {nullptr}, nullptr, 0, 0, 0, 0 } // Sentinel (all null)
+};
+
 // Helper function to draw the correct weather icon based on Cloud_text
 void drawWeatherIconForCloudText() {
   String cloud = String(Cloud_text);
-  cloud.toLowerCase(); // Convert to lowercase for matching
-  // Rainy
-  if (cloud.indexOf("rain") != -1 || cloud.indexOf("rainy") != -1 || cloud.indexOf("pouring") != -1 || cloud.indexOf("hail") != -1) {
-    tft.drawBitmap(14, 10, image_weather_raining_bits, 85, 80, 0xFFFF);
-  }
-  // Lightning/Storm
-  else if (cloud.indexOf("lightning") != -1 || cloud.indexOf("lightning-rainy") != -1 || cloud.indexOf("thunder") != -1) {
-    tft.drawBitmap(12, 10, image_weather_lightning_bits, 90, 85, 0xFFFF);
-  }
-  // Snow
-  else if (cloud.indexOf("snowy") != -1 || cloud.indexOf("snowy-rainy") != -1) {
-    tft.drawBitmap(12, 6, image_weather_snow_bits, 90, 96, 0xFFFF);
-  }
-  // Cloudy + Sunny
-  else if ((cloud.indexOf("partlycloudy") != -1 && cloud.indexOf("cloud") != -1) || cloud.indexOf("cloudy-sunny") != -1) {
-    tft.drawBitmap(12, 10, image_weather_cloudy_sunny_bits, 85, 80, 0xFFFF);
-  }
-  // Cloudy
-  else if (cloud.indexOf("cloudy") != -1 || cloud.indexOf("fog") != -1 || cloud.indexOf("windy") != -1 || cloud.indexOf("windy-variant") != -1) {
-    tft.drawBitmap(12, 20, image_weather_cloud_bits, 85, 80, 0xFFFF);
-  }
-  // Exceptional/Unknown
-  else if (cloud.indexOf("exceptional") != -1 || cloud.indexOf("unknown") != -1) {
-    tft.drawBitmap(12, 6, image_weather_exceptional_bits, 90, 90, 0xFFFF);
-  }
-  // Night/Moon
-  else if (cloud.indexOf("clear-night") != -1 || cloud.indexOf("moon") != -1 || cloud.indexOf("night") != -1) {
-    tft.drawBitmap(14, 15, image_weather_moon_bits, 80, 80, 0xFFFF);
-  }
-  // Sunny/Clear
-  else if (cloud.indexOf("sunny") != -1 || cloud.indexOf("clear") != -1) {
-    tft.drawBitmap(12, 5, image_weather_sunny_bits, 90, 96, 0xFFFF);
+  cloud.toLowerCase();
+  for (int i = 0; iconMappings[i].keywords[0] != nullptr; ++i) {
+    for (int k = 0; iconMappings[i].keywords[k] != nullptr; ++k) {
+      if (cloud.indexOf(iconMappings[i].keywords[k]) != -1) {
+        tft.drawBitmap(iconMappings[i].x, iconMappings[i].y, iconMappings[i].bitmap, iconMappings[i].w, iconMappings[i].h, 0xFFFF);
+        return;
+      }
+    }
   }
   // Default fallback
-  else {
-    tft.drawBitmap(12, 20, image_weather_cloud_bits, 85, 80, 0xFFFF);
-    minorErrorFlag = true; // Set minor error flag for unrecognized cloud text
-    Serial.println("Warning: Unrecognized cloud text: " + cloud);
-  }
+  tft.drawBitmap(12, 20, image_weather_cloud_bits, 85, 80, 0xFFFF);
+  minorErrorFlag = true;
+  Serial.println("Warning: Unrecognized cloud text: " + cloud);
 }
