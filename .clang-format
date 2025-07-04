@@ -1,12 +1,17 @@
 BasedOnStyle: LLVM
 IndentWidth: 2
 ColumnLimit: 120
+
 AllowShortIfStatementsOnASingleLine: true
 AllowShortBlocksOnASingleLine: true
 AllowShortFunctionsOnASingleLine: All
+AllowShortCaseLabelsOnASingleLine: All
+
 AlignConsecutiveDeclarations: true
 AlignConsecutiveAssignments: true
 AlignConsecutiveMacros: true
 AlignTrailingComments: true
 SpaceBeforeParens: ControlStatements
 BreakBeforeBraces: Attach
+
+IndentCaseLabels: true
