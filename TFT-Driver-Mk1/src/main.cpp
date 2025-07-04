@@ -17,18 +17,18 @@ MCUFRIEND_kbv tft;
 #define MAXPRESSURE 1000
 
 // Assign human-readable names to some common 16-bit color values:
-#define BLACK   0x0000
-#define GREY    0x73AE
-#define DARKGREY 0x2104
-#define BLUE    0x001F
+#define BLACK     0x0000
+#define GREY      0x73AE
+#define DARKGREY  0x2104
+#define BLUE      0x001F
 #define LIGHTBLUE 0x055E
-#define RED     0xf800
-#define LIGHTRED 0xfa09
-#define GREEN   0x07E0
-#define CYAN    0x07FF
-#define MAGENTA 0xF81F
-#define YELLOW  0xFFE0
-#define WHITE   0xFFFF
+#define RED       0xf800
+#define LIGHTRED  0xfa09
+#define GREEN     0x07E0
+#define CYAN      0x07FF
+#define MAGENTA   0xF81F
+#define YELLOW    0xFFE0
+#define WHITE     0xFFFF
 
 /*
 // Touchscreen configuration
@@ -65,18 +65,18 @@ void drawTemperatureWithDegreeF(const char *tempStr, int x, int y, int textSize,
 void drawWeatherIconForCloudText();
 
 // Lopaka UI text variables
-char TempHIGH_text[8]              = "HI";
-char TempLOW_text[8]               = "LO";
-char CurrentTEMP_text[8]           = "TEMP";
+char TempHIGH_text[8] = "HI";
+char TempLOW_text[8] = "LO";
+char CurrentTEMP_text[8] = "TEMP";
 char Chance_of_Rain_Number_text[8] = "RAIN";
-char Humidity_Number_text[8]       = "HUMID";
-char Time_text[16]                 = "TIME";
-char Week_Month_Day_text[32]       = "WEEK";
-char Date_text[16]                 = "DATE";
-char Cloud_text[20]                = "CLOUDY";
+char Humidity_Number_text[8] = "HUMID";
+char Time_text[16] = "TIME";
+char Week_Month_Day_text[32] = "WEEK";
+char Date_text[16] = "DATE";
+char Cloud_text[20] = "CLOUDY";
 
 // Track last UART RX time. If no UART message is received after 2 minutes, set Time_text to ERROR and raise flag
-unsigned long lastUartRx      = 0;
+unsigned long lastUartRx = 0;
 bool uartTimeoutFlag = false;
 
 bool minorErrorFlag = false; // Flag for minor errors, e.g. parsing issues
@@ -142,17 +142,17 @@ void drawWeatherUI() {
   drawWeatherIconForCloudText();
 
   // Vert Divider
-  //tft.drawFastVLine(113, 8, 88, WHITE); // Spaced line
+  // tft.drawFastVLine(113, 8, 88, WHITE); // Spaced line
   tft.drawFastVLine(115, 1, 103, WHITE); // Fully connected line
 
   int Deg_F_Offset = 16; // Offset for degree and F when printing in drawTemperatureWithDegreeF
   // TempHIGH (right aligned, 5px padding)
-  int tempHIGHLen   = strlen(TempHIGH_text);
+  int tempHIGHLen = strlen(TempHIGH_text);
   int tempHIGHWidth = tempHIGHLen * 6 * 5;
   drawTemperatureWithDegreeF(TempHIGH_text, 240 - tempHIGHWidth - Deg_F_Offset, 10, 5, LIGHTRED);
 
   // TempLOW (right aligned, 5px padding)
-  int tempLowLen   = strlen(TempLOW_text);
+  int tempLowLen = strlen(TempLOW_text);
   int tempLowWidth = tempLowLen * 6 * 5;
   drawTemperatureWithDegreeF(TempLOW_text, 240 - tempLowWidth - Deg_F_Offset, 57, 5, LIGHTBLUE);
 
@@ -161,7 +161,7 @@ void drawWeatherUI() {
   tft.drawFastHLine(5, 104, 229, WHITE);
 
   // Current TEMP
-  int currentTempLen   = strlen(CurrentTEMP_text);
+  int currentTempLen = strlen(CurrentTEMP_text);
   int currentTempWidth = currentTempLen * 6 * 7;
   drawTemperatureWithDegreeF(CurrentTEMP_text, (240 - currentTempWidth) / 2, 115, 7, WHITE);
 
@@ -180,12 +180,12 @@ void drawWeatherUI() {
 
   // Chance of Rain Symbol and Number (right-aligned together)
   tft.setTextSize(3);
-  int rainNumLen    = strlen(Chance_of_Rain_Number_text);
-  int rainNumWidth  = rainNumLen * 6 * 3;
-  int rainNumRight  = 235; // right edge for both symbol and text
-  int rainNumX      = rainNumRight - rainNumWidth;
-  int rainIconWidth = 30;                           // width of the bitmap
-  int rainIconX     = rainNumX - rainIconWidth - 7; // 7px spacing
+  int rainNumLen = strlen(Chance_of_Rain_Number_text);
+  int rainNumWidth = rainNumLen * 6 * 3;
+  int rainNumRight = 235; // right edge for both symbol and text
+  int rainNumX = rainNumRight - rainNumWidth;
+  int rainIconWidth = 30;                       // width of the bitmap
+  int rainIconX = rainNumX - rainIconWidth - 7; // 7px spacing
   tft.drawBitmap(rainIconX, 177, image_Chance_of_Rain_Symbol_bits, rainIconWidth, 32, WHITE);
   tft.setCursor(rainNumX, 183);
   tft.setTextColor(WHITE);
@@ -223,9 +223,9 @@ void drawWeatherUI() {
 // @param color     The 16-bit color value
 void drawTextCentered(const char *text, int y, int textSize, uint16_t color) {
   tft.setTextSize(textSize);
-  int len       = strlen(text);
+  int len = strlen(text);
   int textWidth = len * 6 * textSize;
-  int x         = (240 - textWidth) / 2;
+  int x = (240 - textWidth) / 2;
   tft.setTextColor(color);
   tft.setCursor(x, y);
   tft.print(text);
@@ -239,9 +239,9 @@ void drawTextCentered(const char *text, int y, int textSize, uint16_t color) {
 // @param align     Alignment: "left", "right", or "center"
 void drawTextAligned(const char *text, int y, int textSize, uint16_t color, const char *align) {
   tft.setTextSize(textSize);
-  int len       = strlen(text);
+  int len = strlen(text);
   int textWidth = len * 6 * textSize;
-  int x         = 0;
+  int x = 0;
   if (strcmp(align, "left") == 0) {
     x = 0;
   } else if (strcmp(align, "right") == 0) {
@@ -262,11 +262,11 @@ void parseWeatherData(const String &input) {
   String data = input;
   data.trim();
   while (idx < data.length()) {
-    int    sep   = data.indexOf(',', idx);
-    String pair  = (sep == -1) ? data.substring(idx) : data.substring(idx, sep);
-    int    colon = pair.indexOf(':');
+    int sep = data.indexOf(',', idx);
+    String pair = (sep == -1) ? data.substring(idx) : data.substring(idx, sep);
+    int colon = pair.indexOf(':');
     if (colon > 0) {
-      String key   = pair.substring(0, colon);
+      String key = pair.substring(0, colon);
       String value = pair.substring(colon + 1);
       value.trim();
       if (key == "HIGH") {
@@ -333,8 +333,8 @@ void drawTemperatureWithDegreeF(const char *tempStr, int x, int y, int textSize,
     return;
   }
 
-  int tempLen    = strlen(tempStr);
-  int charWidth  = 6 * textSize; // Each char is 6px wide in Adafruit_GFX
+  int tempLen = strlen(tempStr);
+  int charWidth = 6 * textSize; // Each char is 6px wide in Adafruit_GFX
   int totalWidth = tempLen * charWidth;
   int totalHeight = textSize * 7; // Height in pixels based on text size
 
@@ -345,8 +345,9 @@ void drawTemperatureWithDegreeF(const char *tempStr, int x, int y, int textSize,
   tft.print(tempStr);
 
   // Calculate where to draw the degree symbol
-  int degRadius = 3; // Default
+  int degRadius = 3;  // Default
   uint8_t F_size = 2; // Default size for 'F'
+  // clang-format off
   switch (textSize) {
     case 3: degRadius = 3; F_size = 1; break;
     case 4: degRadius = 4; F_size = 1; break;
@@ -354,13 +355,14 @@ void drawTemperatureWithDegreeF(const char *tempStr, int x, int y, int textSize,
     case 6: degRadius = 5; F_size = 2; break;
     case 7: degRadius = 5; F_size = 2; break;
   }
+  // clang-format on
 
   int degX = x + totalWidth + degRadius; // Small gap after temp
-  int degY = y + degRadius;             // Vertically aligned with text
+  int degY = y + degRadius;              // Vertically aligned with text
 
   tft.drawCircle(degX, degY, degRadius, WHITE);
 
-  int F_X = x + totalWidth; // Small gap after temp
+  int F_X = x + totalWidth;                   // Small gap after temp
   int F_Y = (y + totalHeight) - (F_size * 7); // Bottom-aligned with temp text
 
   tft.setTextSize(F_size);
@@ -372,22 +374,22 @@ void drawTemperatureWithDegreeF(const char *tempStr, int x, int y, int textSize,
 
 // Struct for weather icon mapping
 struct WeatherIconMapping {
-  const char* keywords[6]; // Up to 5 keywords, null-terminated
-  const uint8_t* bitmap;
+  const char *keywords[6]; // Up to 5 keywords, null-terminated
+  const uint8_t *bitmap;
   int x, y, w, h;
 };
 
 // Icon mappings table
 const WeatherIconMapping iconMappings[] = {
-  { {"rain", "rainy", "pouring", "hail", nullptr}, image_weather_raining_bits, 14, 10, 85, 80 },
-  { {"lightning", "lightning-rainy", "thunder", nullptr}, image_weather_lightning_bits, 12, 10, 90, 85 },
-  { {"snowy", "snowy-rainy", nullptr}, image_weather_snow_bits, 12, 6, 90, 96 },
-  { {"partlycloudy", "cloudy-sunny", nullptr}, image_weather_cloudy_sunny_bits, 12, 10, 85, 80 },
-  { {"cloudy", "fog", "windy", "windy-variant", nullptr}, image_weather_cloud_bits, 12, 20, 85, 80 },
-  { {"exceptional", "unknown", nullptr}, image_weather_exceptional_bits, 12, 6, 90, 90 },
-  { {"clear-night", "moon", "night", nullptr}, image_weather_moon_bits, 16, 15, 80, 80 },
-  { {"sunny", "clear", nullptr}, image_weather_sunny_bits, 12, 5, 90, 96 },
-  { {nullptr}, nullptr, 0, 0, 0, 0 } // Sentinel (all null)
+    {{"rain", "rainy", "pouring", "hail", nullptr}, image_weather_raining_bits, 14, 10, 85, 80},
+    {{"lightning", "lightning-rainy", "thunder", nullptr}, image_weather_lightning_bits, 12, 10, 90, 85},
+    {{"snowy", "snowy-rainy", nullptr}, image_weather_snow_bits, 12, 6, 90, 96},
+    {{"partlycloudy", "cloudy-sunny", nullptr}, image_weather_cloudy_sunny_bits, 12, 10, 85, 80},
+    {{"cloudy", "fog", "windy", "windy-variant", nullptr}, image_weather_cloud_bits, 12, 20, 85, 80},
+    {{"exceptional", "unknown", nullptr}, image_weather_exceptional_bits, 12, 6, 90, 90},
+    {{"clear-night", "moon", "night", nullptr}, image_weather_moon_bits, 16, 15, 80, 80},
+    {{"sunny", "clear", nullptr}, image_weather_sunny_bits, 12, 5, 90, 96},
+    {{nullptr}, nullptr, 0, 0, 0, 0} // Sentinel (all null)
 };
 
 // Helper function to draw the correct weather icon based on Cloud_text
