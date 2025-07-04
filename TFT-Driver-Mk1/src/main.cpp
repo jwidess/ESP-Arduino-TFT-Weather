@@ -376,39 +376,39 @@ void drawWeatherIconForCloudText() {
   cloud.toLowerCase(); // Convert to lowercase for matching
   // Rainy
   if (cloud.indexOf("rain") != -1 || cloud.indexOf("rainy") != -1 || cloud.indexOf("pouring") != -1 || cloud.indexOf("hail") != -1) {
-    tft.drawBitmap(8, 10, image_weather_raining_bits, 85, 80, 0xFFFF);
+    tft.drawBitmap(14, 10, image_weather_raining_bits, 85, 80, 0xFFFF);
   }
   // Lightning/Storm
   else if (cloud.indexOf("lightning") != -1 || cloud.indexOf("lightning-rainy") != -1 || cloud.indexOf("thunder") != -1) {
-    tft.drawBitmap(10, 10, image_weather_lightning_bits, 90, 85, 0xFFFF);
+    tft.drawBitmap(12, 10, image_weather_lightning_bits, 90, 85, 0xFFFF);
   }
   // Snow
   else if (cloud.indexOf("snowy") != -1 || cloud.indexOf("snowy-rainy") != -1) {
-    tft.drawBitmap(9, 6, image_weather_snow_bits, 90, 96, 0xFFFF);
+    tft.drawBitmap(12, 6, image_weather_snow_bits, 90, 96, 0xFFFF);
   }
   // Cloudy + Sunny
   else if ((cloud.indexOf("partlycloudy") != -1 && cloud.indexOf("cloud") != -1) || cloud.indexOf("cloudy-sunny") != -1) {
-    tft.drawBitmap(10, 10, image_weather_cloudy_sunny_bits, 85, 80, 0xFFFF);
+    tft.drawBitmap(12, 10, image_weather_cloudy_sunny_bits, 85, 80, 0xFFFF);
   }
   // Cloudy
   else if (cloud.indexOf("cloudy") != -1 || cloud.indexOf("fog") != -1 || cloud.indexOf("windy") != -1 || cloud.indexOf("windy-variant") != -1) {
-    tft.drawBitmap(10, 20, image_weather_cloud_bits, 85, 80, 0xFFFF);
+    tft.drawBitmap(12, 20, image_weather_cloud_bits, 85, 80, 0xFFFF);
   }
   // Exceptional/Unknown
   else if (cloud.indexOf("exceptional") != -1 || cloud.indexOf("unknown") != -1) {
-    tft.drawBitmap(10, 6, image_weather_exceptional_bits, 90, 90, 0xFFFF);
+    tft.drawBitmap(12, 6, image_weather_exceptional_bits, 90, 90, 0xFFFF);
   }
   // Night/Moon
   else if (cloud.indexOf("clear-night") != -1 || cloud.indexOf("moon") != -1 || cloud.indexOf("night") != -1) {
-    tft.drawBitmap(10, 15, image_weather_moon_bits, 80, 80, 0xFFFF);
+    tft.drawBitmap(14, 15, image_weather_moon_bits, 80, 80, 0xFFFF);
   }
   // Sunny/Clear
   else if (cloud.indexOf("sunny") != -1 || cloud.indexOf("clear") != -1) {
-    tft.drawBitmap(5, 5, image_weather_sunny_bits, 90, 96, 0xFFFF);
+    tft.drawBitmap(12, 5, image_weather_sunny_bits, 90, 96, 0xFFFF);
   }
   // Default fallback
   else {
-    tft.drawBitmap(10, 20, image_weather_cloud_bits, 85, 80, 0xFFFF);
+    tft.drawBitmap(12, 20, image_weather_cloud_bits, 85, 80, 0xFFFF);
     minorErrorFlag = true; // Set minor error flag for unrecognized cloud text
     Serial.println("Warning: Unrecognized cloud text: " + cloud);
   }
