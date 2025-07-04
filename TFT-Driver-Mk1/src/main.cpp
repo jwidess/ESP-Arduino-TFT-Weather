@@ -11,10 +11,6 @@
 MCUFRIEND_kbv tft;
 #include "bitmaps.h"
 #include <SPI.h>
-// #include <TouchScreen.h>
-
-#define MINPRESSURE 200
-#define MAXPRESSURE 1000
 
 // Assign human-readable names to some common 16-bit color values:
 #define BLACK     0x0000
@@ -31,6 +27,9 @@ MCUFRIEND_kbv tft;
 #define WHITE     0xFFFF
 
 /*
+#include <TouchScreen.h>
+#define MINPRESSURE 200
+#define MAXPRESSURE 1000
 // Touchscreen configuration
 char *name = "2.4 TFT ILI9341";
 
@@ -55,6 +54,10 @@ bool Touch_getXY(void) {
 }
 */
 
+// Debug print enable
+//! Enabling this adds 11.2% of RAM and 1.5% of flash usage
+#define DEBUG_PRINT 0 // Set to 1 to enable debug prints
+
 // Function prototypes
 void drawTextCentered(const char *text, int y, int textSize, uint16_t color);
 void drawTextAligned(const char *text, int y, int textSize, uint16_t color, const char *align);
@@ -64,15 +67,15 @@ void drawStatusIndicator();
 void drawTemperatureWithDegreeF(const char *tempStr, int x, int y, int textSize, uint16_t color);
 void drawWeatherIconForCloudText();
 
-// Lopaka UI text variables
-char TempHIGH_text[8] = "HI";
-char TempLOW_text[8] = "LO";
-char CurrentTEMP_text[8] = "TEMP";
-char Chance_of_Rain_Number_text[8] = "RAIN";
-char Humidity_Number_text[8] = "HUMID";
-char Time_text[16] = "TIME";
+// Lopaka UI text variables (https://lopaka.app/gallery/10323/21464)
+char TempHIGH_text[5] = "HI";
+char TempLOW_text[5] = "LO";
+char CurrentTEMP_text[5] = "TEMP";
+char Chance_of_Rain_Number_text[6] = "RAIN";
+char Humidity_Number_text[6] = "HUMID";
+char Time_text[12] = "TIME";
 char Week_Month_Day_text[32] = "WEEK";
-char Date_text[16] = "DATE";
+char Date_text[14] = "DATE";
 char Cloud_text[20] = "CLOUDY";
 
 // Track last UART RX time. If no UART message is received after 2 minutes, set Time_text to ERROR and raise flag
@@ -92,9 +95,10 @@ void setup(void) {
   uint16_t ID = tft.readID();
   Serial.println("=============================");
   Serial.println("Booting TFT-Driver-Mk1...");
-  Serial.println("TFT ID = 0x");
-  Serial.println("=============================");
+  Serial.print("TFT ID = 0x");
   Serial.println(ID, HEX);
+  if (DEBUG_PRINT) Serial.println("!! DEBUG MODE ENABLED !!");
+  Serial.println("=============================");
   if (ID == 0xD3D3) ID = 0x9486; // write-only shield
   tft.begin(ID);
   tft.setRotation(0); // PORTRAIT
@@ -316,23 +320,25 @@ void parseWeatherData(const String &input) {
     idx = sep + 1;
   }
 
-  Serial.println("--- UART RX Payload ---");
-  Serial.println(input);
-  Serial.println("-----------------------");
-  // Print formatted values for debugging
-  // clang-format off
-  Serial.println("--- Weather Data ---");
-  Serial.print("TempHIGH_text: "); Serial.println(TempHIGH_text);
-  Serial.print("TempLOW_text: "); Serial.println(TempLOW_text);
-  Serial.print("CurrentTEMP_text: "); Serial.println(CurrentTEMP_text);
-  Serial.print("Chance_of_Rain_Number_text: "); Serial.println(Chance_of_Rain_Number_text);
-  Serial.print("Humidity_Number_text: "); Serial.println(Humidity_Number_text);
-  Serial.print("Time_text: "); Serial.println(Time_text);
-  Serial.print("Week_Month_Day_text: "); Serial.println(Week_Month_Day_text);
-  Serial.print("Date_text: "); Serial.println(Date_text);
-  Serial.print("Cloud_text: "); Serial.println(Cloud_text);
-  Serial.println("--------------------");
-  // clang-format on
+  if (DEBUG_PRINT) {
+    Serial.println("--- UART RX Payload ---");
+    Serial.println(input);
+    Serial.println("-----------------------");
+    // Print formatted values for debugging
+    // clang-format off
+    Serial.println("--- Weather Data ---");
+    Serial.print("TempHIGH_text: "); Serial.println(TempHIGH_text);
+    Serial.print("TempLOW_text: "); Serial.println(TempLOW_text);
+    Serial.print("CurrentTEMP_text: "); Serial.println(CurrentTEMP_text);
+    Serial.print("Chance_of_Rain_Number_text: "); Serial.println(Chance_of_Rain_Number_text);
+    Serial.print("Humidity_Number_text: "); Serial.println(Humidity_Number_text);
+    Serial.print("Time_text: "); Serial.println(Time_text);
+    Serial.print("Week_Month_Day_text: "); Serial.println(Week_Month_Day_text);
+    Serial.print("Date_text: "); Serial.println(Date_text);
+    Serial.print("Cloud_text: "); Serial.println(Cloud_text);
+    Serial.println("--------------------");
+    // clang-format on
+  }
 }
 
 void drawStatusIndicator() {
