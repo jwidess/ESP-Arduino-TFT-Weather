@@ -186,9 +186,28 @@ void drawWeatherUI() {
   int rainNumX = rainNumRight - rainNumWidth;
   int rainIconWidth = 30;                       // width of the bitmap
   int rainIconX = rainNumX - rainIconWidth - 7; // 7px spacing
-  tft.drawBitmap(rainIconX, 177, image_Chance_of_Rain_Symbol_bits, rainIconWidth, 32, WHITE);
+
+  // Determine color based on rain chance
+  uint16_t rainColor = WHITE;
+  int rainPercent = 0;
+  // Extract number value from Chance_of_Rain_Number_text (e.g, "55%")
+  // Yes this is a bit hacky, but it works
+  char percentStr[4] = {0};
+  for (int i = 0, j = 0; Chance_of_Rain_Number_text[i] != '\0' && j < 3; ++i) {
+    if (isdigit(Chance_of_Rain_Number_text[i])) {
+      percentStr[j++] = Chance_of_Rain_Number_text[i];
+    } else {
+      break;
+    }
+  }
+  if (percentStr[0] != '\0') {
+    rainPercent = atoi(percentStr);
+    if (rainPercent >= 50) { rainColor = LIGHTRED; }
+  }
+
+  tft.drawBitmap(rainIconX, 177, image_Chance_of_Rain_Symbol_bits, rainIconWidth, 32, rainColor);
   tft.setCursor(rainNumX, 183);
-  tft.setTextColor(WHITE);
+  tft.setTextColor(rainColor);
   tft.print(Chance_of_Rain_Number_text);
 
   // Below Humid Divider
@@ -269,6 +288,9 @@ void parseWeatherData(const String &input) {
       String key = pair.substring(0, colon);
       String value = pair.substring(colon + 1);
       value.trim();
+      if (value.length() == 0) {
+        minorErrorFlag = true; // Set error flag if any value is empty
+      }
       if (key == "HIGH") {
         value.toCharArray(TempHIGH_text, sizeof(TempHIGH_text));
       } else if (key == "LOW") {
