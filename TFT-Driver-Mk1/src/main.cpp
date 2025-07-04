@@ -22,7 +22,8 @@ MCUFRIEND_kbv tft;
 #define DARKGREY 0x2104
 #define BLUE    0x001F
 #define LIGHTBLUE 0x055E
-#define RED     0xF800
+#define RED     0xf800
+#define LIGHTRED 0xfa09
 #define GREEN   0x07E0
 #define CYAN    0x07FF
 #define MAGENTA 0xF81F
@@ -61,8 +62,7 @@ void drawWeatherUI();
 void parseWeatherData(const String &input);
 void drawStatusIndicator();
 void drawTemperatureWithDegreeF(const char *tempStr, int x, int y, int textSize, uint16_t color);
-
-String cloudDesc = "Partly Cloudy";
+void drawWeatherIconForCloudText();
 
 // Lopaka UI text variables
 char TempHIGH_text[8]              = "HI";
@@ -73,10 +73,13 @@ char Humidity_Number_text[8]       = "HUMID";
 char Time_text[16]                 = "TIME";
 char Week_Month_Day_text[32]       = "WEEK";
 char Date_text[16]                 = "DATE";
+char Cloud_text[20]                = "CLOUDY";
 
 // Track last UART RX time. If no UART message is received after 2 minutes, set Time_text to ERROR and raise flag
 unsigned long lastUartRx      = 0;
 bool uartTimeoutFlag = false;
+
+bool minorErrorFlag = false; // Flag for minor errors, e.g. parsing issues
 
 // Status indicator animation state
 uint8_t statusAnimIdx = 0;
@@ -135,24 +138,27 @@ void drawWeatherUI() {
   // Outline
   tft.drawRect(0, 0, 240, 320, 0xF206);
 
-  // Cloud Cover Symbol
-  tft.drawBitmap(5, 5, image_Cloud_Cover_Symbol_bits, 90, 96, 0xFFFF);
+  // Cloud Cover Symbol (dynamic)
+  drawWeatherIconForCloudText();
+
+  // Vert Divider
+  //tft.drawFastVLine(113, 8, 88, WHITE); // Spaced line
+  tft.drawFastVLine(115, 1, 103, WHITE); // Fully connected line
 
   int Deg_F_Offset = 16; // Offset for degree and F when printing in drawTemperatureWithDegreeF
   // TempHIGH (right aligned, 5px padding)
   int tempHIGHLen   = strlen(TempHIGH_text);
   int tempHIGHWidth = tempHIGHLen * 6 * 5;
-  drawTemperatureWithDegreeF(TempHIGH_text, 240 - tempHIGHWidth - Deg_F_Offset, 10, 5, RED);
+  drawTemperatureWithDegreeF(TempHIGH_text, 240 - tempHIGHWidth - Deg_F_Offset, 10, 5, LIGHTRED);
 
   // TempLOW (right aligned, 5px padding)
-  tft.setTextColor(0x55E);
-  tft.setTextSize(5);
   int tempLowLen   = strlen(TempLOW_text);
   int tempLowWidth = tempLowLen * 6 * 5;
   drawTemperatureWithDegreeF(TempLOW_text, 240 - tempLowWidth - Deg_F_Offset, 57, 5, LIGHTBLUE);
 
   // Above Temp Divider
-  tft.drawLine(5, 104, 234, 104, WHITE);
+  // tft.drawLine(5, 104, 234, 104, WHITE);
+  tft.drawFastHLine(5, 104, 229, WHITE);
 
   // Current TEMP
   int currentTempLen   = strlen(CurrentTEMP_text);
@@ -160,13 +166,14 @@ void drawWeatherUI() {
   drawTemperatureWithDegreeF(CurrentTEMP_text, (240 - currentTempWidth) / 2, 115, 7, WHITE);
 
   // Below Temp Divider
-  tft.drawLine(5, 173, 234, 173, WHITE);
+  // tft.drawLine(5, 173, 234, 173, WHITE);
+  tft.drawFastHLine(5, 173, 229, WHITE);
 
   // Humidity Symbol
-  tft.setTextColor(WHITE);
   tft.drawBitmap(5, 180, image_Humidity_Symbol_bits, 17, 24, WHITE);
 
   // Humidity Number
+  tft.setTextColor(WHITE);
   tft.setTextSize(3);
   tft.setCursor(30, 182);
   tft.print(Humidity_Number_text);
@@ -185,7 +192,8 @@ void drawWeatherUI() {
   tft.print(Chance_of_Rain_Number_text);
 
   // Below Humid Divider
-  tft.drawLine(5, 212, 234, 212, WHITE);
+  // tft.drawLine(5, 212, 234, 212, WHITE);
+  tft.drawFastHLine(5, 212, 229, WHITE);
 
   // Time (centered)
   uartTimeoutFlag == true ? drawTextCentered(Time_text, 227, 4, RED) : drawTextCentered(Time_text, 227, 4, WHITE);
@@ -194,11 +202,18 @@ void drawWeatherUI() {
   drawTextCentered(Week_Month_Day_text, 275, 2, WHITE);
 
   // Date Underline
-  tft.drawLine(20, 294, 219, 294, WHITE);
+  // tft.drawLine(20, 294, 219, 294, WHITE);
+  tft.drawFastHLine(20, 294, 200, WHITE); // Centered underline
 
   // Date (centered) E.g. "1/17/2025"
   drawTextCentered(Date_text, 301, 2, WHITE);
   tft.setTextWrap(false);
+
+  // Draw minor error indicator if needed
+  if (minorErrorFlag) {
+    tft.fillCircle(232, 312, 4, YELLOW); // Small yellow circle, bottom right
+  }
+  minorErrorFlag = false; // Reset after drawing
 }
 
 // Draw text centered horizontally on the display
@@ -272,7 +287,7 @@ void parseWeatherData(const String &input) {
       } else if (key == "DATETXT") {
         value.toCharArray(Date_text, sizeof(Date_text));
       } else if (key == "CLOUD") {
-        cloudDesc = value;
+        value.toCharArray(Cloud_text, sizeof(Cloud_text));
       }
     }
     if (sep == -1) break;
@@ -293,7 +308,7 @@ void parseWeatherData(const String &input) {
   Serial.print("Time_text: "); Serial.println(Time_text);
   Serial.print("Week_Month_Day_text: "); Serial.println(Week_Month_Day_text);
   Serial.print("Date_text: "); Serial.println(Date_text);
-  Serial.print("cloudDesc: "); Serial.println(cloudDesc);
+  Serial.print("Cloud_text: "); Serial.println(Cloud_text);
   Serial.println("--------------------");
   // clang-format on
 }
@@ -340,7 +355,6 @@ void drawTemperatureWithDegreeF(const char *tempStr, int x, int y, int textSize,
     case 7: degRadius = 5; F_size = 2; break;
   }
 
-  //int degX = x + totalWidth + 1 + textSize / 2; // Small gap after temp
   int degX = x + totalWidth + degRadius; // Small gap after temp
   int degY = y + degRadius;             // Vertically aligned with text
 
@@ -354,4 +368,48 @@ void drawTemperatureWithDegreeF(const char *tempStr, int x, int y, int textSize,
 
   tft.setCursor(F_X, F_Y);
   tft.print('F');
+}
+
+// Helper function to draw the correct weather icon based on Cloud_text
+void drawWeatherIconForCloudText() {
+  String cloud = String(Cloud_text);
+  cloud.toLowerCase(); // Convert to lowercase for matching
+  // Rainy
+  if (cloud.indexOf("rain") != -1 || cloud.indexOf("rainy") != -1 || cloud.indexOf("pouring") != -1 || cloud.indexOf("hail") != -1) {
+    tft.drawBitmap(8, 10, image_weather_raining_bits, 85, 80, 0xFFFF);
+  }
+  // Lightning/Storm
+  else if (cloud.indexOf("lightning") != -1 || cloud.indexOf("lightning-rainy") != -1 || cloud.indexOf("thunder") != -1) {
+    tft.drawBitmap(10, 10, image_weather_lightning_bits, 90, 85, 0xFFFF);
+  }
+  // Snow
+  else if (cloud.indexOf("snowy") != -1 || cloud.indexOf("snowy-rainy") != -1) {
+    tft.drawBitmap(9, 6, image_weather_snow_bits, 90, 96, 0xFFFF);
+  }
+  // Cloudy + Sunny
+  else if ((cloud.indexOf("partlycloudy") != -1 && cloud.indexOf("cloud") != -1) || cloud.indexOf("cloudy-sunny") != -1) {
+    tft.drawBitmap(10, 10, image_weather_cloudy_sunny_bits, 85, 80, 0xFFFF);
+  }
+  // Cloudy
+  else if (cloud.indexOf("cloudy") != -1 || cloud.indexOf("fog") != -1 || cloud.indexOf("windy") != -1 || cloud.indexOf("windy-variant") != -1) {
+    tft.drawBitmap(10, 20, image_weather_cloud_bits, 85, 80, 0xFFFF);
+  }
+  // Exceptional/Unknown
+  else if (cloud.indexOf("exceptional") != -1 || cloud.indexOf("unknown") != -1) {
+    tft.drawBitmap(10, 6, image_weather_exceptional_bits, 90, 90, 0xFFFF);
+  }
+  // Night/Moon
+  else if (cloud.indexOf("clear-night") != -1 || cloud.indexOf("moon") != -1 || cloud.indexOf("night") != -1) {
+    tft.drawBitmap(10, 15, image_weather_moon_bits, 80, 80, 0xFFFF);
+  }
+  // Sunny/Clear
+  else if (cloud.indexOf("sunny") != -1 || cloud.indexOf("clear") != -1) {
+    tft.drawBitmap(5, 5, image_weather_sunny_bits, 90, 96, 0xFFFF);
+  }
+  // Default fallback
+  else {
+    tft.drawBitmap(10, 20, image_weather_cloud_bits, 85, 80, 0xFFFF);
+    minorErrorFlag = true; // Set minor error flag for unrecognized cloud text
+    Serial.println("Warning: Unrecognized cloud text: " + cloud);
+  }
 }
