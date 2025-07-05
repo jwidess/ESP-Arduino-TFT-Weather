@@ -81,3 +81,64 @@
       state: "{{ daily['weather.pirateweather'].forecast[0].wind_gust_speed }}"
       unit_of_measurement: mph
       icon: mdi:weather-windy
+
+# Hourly Forecast Info
+- trigger:
+    - platform: time_pattern
+      minutes: "/15"
+    - platform: homeassistant
+      event: start
+    - platform: event
+      event_type: event_template_reloaded
+  action:
+    - service: weather.get_forecasts
+      data:
+        type: hourly
+      target:
+        entity_id: weather.pirateweather
+      response_variable: hourly
+  sensor:
+    - name: Forecast Next Hour Condition
+      unique_id: forecast_next_hour_condition
+      state: "{{ hourly['weather.pirateweather'].forecast[0].condition }}"
+      icon: mdi:weather-partly-rainy
+    - name: Forecast Next Hour Temperature
+      unique_id: forecast_next_hour_temperature
+      state: "{{ hourly['weather.pirateweather'].forecast[0].temperature }}"
+      unit_of_measurement: °F
+      device_class: temperature
+    - name: Forecast Next Hour Apparent Temperature
+      unique_id: forecast_next_hour_apparent_temperature
+      state: "{{ hourly['weather.pirateweather'].forecast[0].apparent_temperature }}"
+      unit_of_measurement: °F
+      device_class: temperature
+    - name: Forecast Next Hour Humidity
+      unique_id: forecast_next_hour_humidity
+      state: "{{ hourly['weather.pirateweather'].forecast[0].humidity }}"
+      unit_of_measurement: "%"
+      device_class: humidity
+    - name: Forecast Next Hour Cloud Cover
+      unique_id: forecast_next_hour_cloud_cover
+      state: "{{ hourly['weather.pirateweather'].forecast[0].cloud_coverage }}"
+      unit_of_measurement: "%"
+      icon: mdi:cloud
+    - name: Forecast Next Hour Precipitation Probability
+      unique_id: forecast_next_hour_precipitation_probability
+      state: "{{ hourly['weather.pirateweather'].forecast[0].precipitation_probability }}"
+      unit_of_measurement: "%"
+      icon: mdi:water-percent
+    - name: Forecast Next Hour Precipitation
+      unique_id: forecast_next_hour_precipitation
+      state: "{{ hourly['weather.pirateweather'].forecast[0].precipitation }}"
+      unit_of_measurement: in
+      icon: mdi:water
+    - name: Forecast Next Hour Wind Bearing
+      unique_id: forecast_next_hour_wind_bearing
+      state: "{{ hourly['weather.pirateweather'].forecast[0].wind_bearing }}"
+      unit_of_measurement: "°"
+      icon: mdi:compass
+    - name: Forecast Next Hour Wind Speed
+      unique_id: forecast_next_hour_wind_speed
+      state: "{{ hourly['weather.pirateweather'].forecast[0].wind_speed }}"
+      unit_of_measurement: mph
+      icon: mdi:weather-windy

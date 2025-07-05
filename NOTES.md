@@ -1,14 +1,44 @@
 # Project Notes!
+General unorganized project notes.
 
 ## Display Testing Results
 **Display Name:** 2.4inch 320x240 TFT LCD Display Module ILI9341 Resistive Touchscreen 8-bit Parallel Interface SD Card Slot for Arduino - AliExpress
-Using `graphictest_kbv.ino` had by far the best performance compared to other display libraries. Everything was drawn very quickly. 
+
+Using the [MCUFRIEND_kbv](https://github.com/prenticedavid/MCUFRIEND_kbv) library had by far the best performance compared to other display libraries. Everything was drawn very quickly. 
+
+### 16-bit RGB Color Picker
+https://rgbcolorpicker.com/565
+
+## Condition Value Mapping to Bitmaps
+Below is a table of all 15 possible values of the `condition` parameter in HA and how they are mapped to the available bitmaps in the `bitmaps.h`
+
+| Condition Value: | Bitmap Displayed: |
+| ---------------- | ----------------- |
+| clear-night      | Moon              |
+| exceptional      | Exceptional       |
+| cloudy           | cloudy            |
+| sunny            | Sunny             |
+| snowy-rainy      | Snow              |
+| snowy            | Snow              |
+| rainy            | Rainy             |
+| pouring          | Rainy             |
+| hail             | Rainy             |
+| lightning-rainy  | Lightning         |
+| lightning        | Lightning         |
+| partlycloudy     | Cloudy Sunny      |
+| windy-variant    | Cloudy            |
+| windy            | Cloudy            |
+| fog              | Cloudy            |
 
 ## UART Comms
 Example ESP8266 Send: `HIGH:82,LOW:72,TEMP:74,RAIN:15,HUM:47,TIME:10:15 AM,DATE:Monday - Jan 17th,DATETXT:1/17/2025,CLOUD:clear\n`
 
 ### Tesing UART RX:
 Formatted input and output test:
+
+<details>
+<summary>Serial Monitor Output:</summary>
+
 ```
 ---- Sent utf8 encoded message: "HIGH:82,LOW:72,TEMP:74,RAIN:15,HUM:47,TIME:10:15 AM,DATE:Monday - Jan 17th,DATETXT:1/17/2025,CLOUD:clear\n" ----
 --- Weather Data ---
@@ -33,9 +63,13 @@ Week_Month_Day_text: Saturday - Feb 21st
 Date_text: 12/11/2029
 --------------------
 ```
+</details>
 
 ### Touchscreen Calibration
-From `MCUFRIEND_kbv`->`TouchScreen_Calibr_native`
+From `MCUFRIEND_kbv`->`TouchScreen_Calibr_native`:
+<details>
+<summary>Serial Monitor Output:</summary>
+
 ```
 Typical 30k Analog pullup with corresponding pin
 would read low when digital is written LOW
@@ -69,6 +103,7 @@ y = map(p.x, TOP=856, BOT=155, 0, 240)
 ```
 
 Output of `LCD_ID_readnew.ino`:
+
 ```
 Read Special Registers on MCUFRIEND UNO shield
 controllers either read as single 16-bit
@@ -118,6 +153,6 @@ reg(0x00EF) 00 03 80 02 02 02	ILI9327
 reg(0x00F2) 00 02 02 02 02 02 02 02 02 02 02 02	Adjust Control 2
 reg(0x00F6) 00 01 00 00	Interface Control
 ```
-
+</details>
 
 
