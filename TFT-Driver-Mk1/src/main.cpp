@@ -26,6 +26,10 @@ MCUFRIEND_kbv tft;
 #define YELLOW    0xFFE0
 #define WHITE     0xFFFF
 
+// 2.4" 320x240 TFT display configuration
+#define TFT_WIDTH  240 // Width in pixels
+#define TFT_HEIGHT 320 // Height in pixels
+
 /*
 #include <TouchScreen.h>
 #define MINPRESSURE 200
@@ -60,7 +64,6 @@ bool Touch_getXY(void) {
 
 // Function prototypes
 void drawTextCentered(const char *text, int y, int textSize, uint16_t color);
-void drawTextAligned(const char *text, int y, int textSize, uint16_t color, const char *align);
 void drawWeatherUI();
 void parseWeatherData(const String &input);
 void drawStatusIndicator();
@@ -140,7 +143,7 @@ void loop(void) {
 void drawWeatherUI() {
   tft.fillScreen(BLACK);
   // Outline
-  tft.drawRect(0, 0, 240, 320, 0xF206);
+  tft.drawRect(0, 0, TFT_WIDTH, TFT_HEIGHT, 0xF206);
 
   // Cloud Cover Symbol (dynamic)
   drawWeatherIconForCloudText();
@@ -153,12 +156,12 @@ void drawWeatherUI() {
   // TempHIGH (right aligned, 5px padding)
   int tempHIGHLen = strlen(TempHIGH_text);
   int tempHIGHWidth = tempHIGHLen * 6 * 5;
-  drawTemperatureWithDegreeF(TempHIGH_text, 240 - tempHIGHWidth - Deg_F_Offset, 10, 5, LIGHTRED);
+  drawTemperatureWithDegreeF(TempHIGH_text, TFT_WIDTH - tempHIGHWidth - Deg_F_Offset, 10, 5, LIGHTRED);
 
   // TempLOW (right aligned, 5px padding)
   int tempLowLen = strlen(TempLOW_text);
   int tempLowWidth = tempLowLen * 6 * 5;
-  drawTemperatureWithDegreeF(TempLOW_text, 240 - tempLowWidth - Deg_F_Offset, 57, 5, LIGHTBLUE);
+  drawTemperatureWithDegreeF(TempLOW_text, TFT_WIDTH - tempLowWidth - Deg_F_Offset, 57, 5, LIGHTBLUE);
 
   // Above Temp Divider
   // tft.drawLine(5, 104, 234, 104, WHITE);
@@ -167,7 +170,7 @@ void drawWeatherUI() {
   // Current TEMP
   int currentTempLen = strlen(CurrentTEMP_text);
   int currentTempWidth = currentTempLen * 6 * 7;
-  drawTemperatureWithDegreeF(CurrentTEMP_text, (240 - currentTempWidth) / 2, 115, 7, WHITE);
+  drawTemperatureWithDegreeF(CurrentTEMP_text, (TFT_WIDTH - currentTempWidth) / 2, 115, 7, WHITE);
 
   // Below Temp Divider
   // tft.drawLine(5, 173, 234, 173, WHITE);
@@ -219,7 +222,7 @@ void drawWeatherUI() {
   tft.drawFastHLine(5, 212, 229, WHITE);
 
   // Time (centered)
-  uartTimeoutFlag == true ? drawTextCentered(Time_text, 227, 4, RED) : drawTextCentered(Time_text, 227, 4, WHITE);
+  drawTextCentered(Time_text, 227, 4, uartTimeoutFlag ? RED : WHITE);
 
   // Week_Month_Day (centered) E.g. "Monday - Jan 17th"
   drawTextCentered(Week_Month_Day_text, 275, 2, WHITE);
@@ -230,7 +233,6 @@ void drawWeatherUI() {
 
   // Date (centered) E.g. "1/17/2025"
   drawTextCentered(Date_text, 301, 2, WHITE);
-  tft.setTextWrap(false);
 
   // Draw minor error indicator if needed
   if (minorErrorFlag) {
@@ -248,30 +250,7 @@ void drawTextCentered(const char *text, int y, int textSize, uint16_t color) {
   tft.setTextSize(textSize);
   int len = strlen(text);
   int textWidth = len * 6 * textSize;
-  int x = (240 - textWidth) / 2;
-  tft.setTextColor(color);
-  tft.setCursor(x, y);
-  tft.print(text);
-}
-
-// Draw text aligned left, right, or center on the display
-// @param text      The string to print
-// @param y         The y position (top of text)
-// @param textSize  The text size (as used by setTextSize)
-// @param color     The 16-bit color value
-// @param align     Alignment: "left", "right", or "center"
-void drawTextAligned(const char *text, int y, int textSize, uint16_t color, const char *align) {
-  tft.setTextSize(textSize);
-  int len = strlen(text);
-  int textWidth = len * 6 * textSize;
-  int x = 0;
-  if (strcmp(align, "left") == 0) {
-    x = 0;
-  } else if (strcmp(align, "right") == 0) {
-    x = 240 - textWidth;
-  } else if (strcmp(align, "center") == 0) {
-    x = (240 - textWidth) / 2;
-  }
+  int x = (TFT_WIDTH - textWidth) / 2;
   tft.setTextColor(color);
   tft.setCursor(x, y);
   tft.print(text);
