@@ -35,6 +35,11 @@ text_sensor:
     entity_id: sensor.uart_weather_payload
     id: uart_weather_payload
 
+output:
+  - platform: gpio
+    pin: GPIO2
+    id: led_builtin
+
 # UART setup: only TX needed
 uart:
   id: uart_bus
@@ -43,7 +48,7 @@ uart:
   debug:
     direction: TX  # Log outgoing UART data for debugging
 
-# Every minute, log and send the payload string plus newline
+# # Every minute, log and send the payload string plus newline
 interval:
   - interval: 60s
     then:
@@ -54,5 +59,8 @@ interval:
             std::string s = id(uart_weather_payload).state + "\n";
             ESP_LOGD("UART", "Sending payload: '%s'", s.c_str());
             return std::vector<uint8_t>(s.begin(), s.end());
+      - output.turn_off: led_builtin # Active low, turn on when UART send.
 
-
+  - interval: 1s
+    then:
+      - output.turn_on: led_builtin # Active low, turn off every 1s
