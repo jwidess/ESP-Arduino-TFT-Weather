@@ -1,6 +1,9 @@
 # Project Notes!
 General unorganized project notes.
 
+## To-Do:
+- Use AccuWeather `sensor.home_condition_day_0` as scrolling text of the days weather summary.
+
 ## Display Testing Results
 **Display Name:** 2.4inch 320x240 TFT LCD Display Module ILI9341 Resistive Touchscreen 8-bit Parallel Interface SD Card Slot for Arduino - AliExpress
 
