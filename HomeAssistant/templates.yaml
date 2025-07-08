@@ -12,7 +12,7 @@
           ",TIME:" ~ now().strftime('%-I:%M %p') ~
           ",DATE:" ~ now().strftime('%A - %b %-d') ~
           ",DATETXT:" ~ now().strftime('%-m/%-d/%Y') ~
-          ",CLOUD:" ~ (states('sensor.forecast_today_condition') if states('sensor.forecast_today_condition') not in ['unavailable', 'unknown'] else 'clear')
+          ",CLOUD:" ~ (states('sensor.forecast_next_hour_condition') if states('sensor.forecast_next_hour_condition') not in ['unavailable', 'unknown'] else 'ERROR')
         }}
 
 # Below trigger credit to rossc719: https://community.home-assistant.io/t/i-just-want-todays-high-temp/758604/5?u=jwidess
