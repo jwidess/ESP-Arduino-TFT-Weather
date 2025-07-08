@@ -39,6 +39,25 @@ output:
   - platform: gpio
     pin: GPIO2
     id: led_builtin
+  - platform: gpio
+    pin: GPIO12  # D6
+    id: tft_power_pin
+
+switch:
+  - platform: output
+    name: "Weather Display Power"
+    id: weather_display_power
+    output: tft_power_pin
+    restore_mode: ALWAYS_ON # Always on after boot
+    on_turn_on: # On turn on send UART payload
+      then:
+        - delay: 4s # Allow time for Arduino to boot
+        - uart.write:
+            id: uart_bus
+            data: !lambda |-
+              std::string s = id(uart_weather_payload).state + "\n";
+              ESP_LOGD("UART", "Sending payload due to TFT ON: '%s'", s.c_str());
+              return std::vector<uint8_t>(s.begin(), s.end());
 
 # UART setup: only TX needed
 uart:
