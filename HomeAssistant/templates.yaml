@@ -1,5 +1,17 @@
 # This file contains Home Assistant templates to create the sensors and triggers for weather data.
 - sensor:
+    # Calculates the highest chance of precipitation from multiple sources
+    - name: "Highest Precipitation Probability"
+      unique_id: highest_precipitation_probability
+      unit_of_measurement: "%"
+      icon: mdi:water-percent
+      state: >-
+        {% set pirate_day = states('sensor.forecast_today_precipitation_probability') | float(0) %}
+        {% set pirate_hour = states('sensor.forecast_next_hour_precipitation_probability') | float(0) %}
+        {% set accu = states('sensor.forecast_today_precipitation_probability_2') | float(0) %}
+        {{ [pirate_day, pirate_hour, accu] | max | round(0) | int }}
+
+    # Generates the UART Weather Payload to be sent in ESPHome
     - name: "UART Weather Payload"
       unique_id: uart_weather_payload
       state: >-
@@ -7,7 +19,7 @@
           "HIGH:" ~ (states('sensor.forecast_today_temperature') if states('sensor.forecast_today_temperature') not in ['unavailable', 'unknown'] else '0') ~
           ",LOW:" ~ (states('sensor.forecast_today_low_temperature') if states('sensor.forecast_today_low_temperature') not in ['unavailable', 'unknown'] else '0') ~
           ",TEMP:" ~ (state_attr('weather.pirateweather', 'temperature') | int) ~
-          ",RAIN:" ~ ((states('sensor.forecast_today_precipitation_probability') | float(0)) | round(0) | int) ~
+          ",RAIN:" ~ ((states('sensor.highest_precipitation_probability') | float(0)) | round(0) | int) ~
           ",HUM:" ~ (state_attr('weather.pirateweather', 'humidity') | int) ~
           ",TIME:" ~ now().strftime('%-I:%M %p') ~
           ",DATE:" ~ now().strftime('%A - %b %-d') ~
@@ -15,11 +27,11 @@
           ",CLOUD:" ~ (states('sensor.forecast_next_hour_condition') if states('sensor.forecast_next_hour_condition') not in ['unavailable', 'unknown'] else 'ERROR')
         }}
 
-# Below trigger credit to rossc719: https://community.home-assistant.io/t/i-just-want-todays-high-temp/758604/5?u=jwidess
-# Uses PirateWeather integration to get daily forecasts
+# PirateWeather Daily Forecast
 - trigger:
     - platform: time_pattern
       hours: /1
+      #minutes: "/30"
     - platform: homeassistant
       event: start
     - platform: event
@@ -82,7 +94,7 @@
       unit_of_measurement: mph
       icon: mdi:weather-windy
 
-# Hourly Forecast Info
+# PirateWeather Hourly Forecast Info
 - trigger:
     - platform: time_pattern
       minutes: "/15"
@@ -140,5 +152,72 @@
     - name: Forecast Next Hour Wind Speed
       unique_id: forecast_next_hour_wind_speed
       state: "{{ hourly['weather.pirateweather'].forecast[0].wind_speed }}"
+      unit_of_measurement: mph
+      icon: mdi:weather-windy
+
+# AccuWeather Daily Forecast
+- trigger:
+    - platform: time_pattern
+      hours: /1
+      #minutes: "/1"
+    - platform: homeassistant
+      event: start
+    - platform: event
+      event_type: event_template_reloaded
+  action:
+    - service: weather.get_forecasts
+      data:
+        type: daily
+      target:
+        entity_id: weather.home
+      response_variable: daily
+  sensor:
+    - name: AW Forecast Today Condition
+      unique_id: aw_forecast_today_condition
+      state: "{{ daily['weather.home'].forecast[0].condition }}"
+      icon: mdi:weather-partly-rainy
+    - name: AW Forecast Today Temperature
+      unique_id: aw_forecast_today_temperature
+      state: "{{ daily['weather.home'].forecast[0].temperature }}"
+      unit_of_measurement: °F
+      device_class: temperature
+    - name: AW Forecast Today Low Temperature
+      unique_id: aw_forecast_today_low_temp
+      state: "{{ daily['weather.home'].forecast[0].templow }}"
+      unit_of_measurement: °F
+      device_class: temperature
+    - name: AW Forecast Today Humidity
+      unique_id: aw_forecast_today_humidity
+      state: "{{ daily['weather.home'].forecast[0].humidity }}"
+      unit_of_measurement: "%"
+      device_class: humidity
+    - name: AW Forecast Today Cloud Cover
+      unique_id: aw_forecast_today_cloud_cover
+      state: "{{ daily['weather.home'].forecast[0].cloud_coverage }}"
+      unit_of_measurement: "%"
+      icon: mdi:cloud
+    - name: AW Forecast Today Precipitation Probability
+      unique_id: aw_forecast_today_precipitation_probability
+      state: "{{ daily['weather.home'].forecast[0].precipitation_probability }}"
+      unit_of_measurement: "%"
+      icon: mdi:water-percent
+    - name: AW Forecast Today Precipitation
+      unique_id: aw_forecast_today_precipitation
+      state: "{{ daily['weather.home'].forecast[0].precipitation }}"
+      unit_of_measurement: in
+      icon: mdi:water
+    - name: AW Forecast Today Wind Bearing
+      unique_id: aw_forecast_today_wind_bearing
+      state: "{{ daily['weather.home'].forecast[0].wind_bearing }}"
+      unit_of_measurement: "°"
+      icon: mdi:compass
+    - name: AW Forecast Today Wind Speed
+      unique_id: aw_forecast_today_wind_speed
+      state: "{{ daily['weather.home'].forecast[0].wind_speed }}"
+      unit_of_measurement: mph
+      icon: mdi:weather-windy
+    - name: AW Forecast Today Wind Gust Speed
+      unique_id: aw_forecast_today_wind_gust_speed
+      state: "{{ daily['weather.home'].forecast[0].wind_gust_speed }}"
       unit_of_measurement: mph
       icon: mdi:weather-windy
