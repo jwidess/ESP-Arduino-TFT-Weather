@@ -71,6 +71,7 @@ uart:
 interval:
   - interval: 60s
     then:
+      - output.turn_off: led_builtin # Active low, turn on when UART send.
       - uart.write:
           id: uart_bus
           data: !lambda |-
@@ -78,7 +79,6 @@ interval:
             std::string s = id(uart_weather_payload).state + "\n";
             ESP_LOGD("UART", "Sending payload: '%s'", s.c_str());
             return std::vector<uint8_t>(s.begin(), s.end());
-      - output.turn_off: led_builtin # Active low, turn on when UART send.
 
   - interval: 1s
     then:

@@ -1,7 +1,7 @@
 // TFT-Driver-Mk1
 // https://github.com/jwidess/ESP-Arduino-TFT-Weather
 // Author: Jwidess
-// This sketch is for a 2.4" 320x240 TFT ILI9341 display with touch panel on an Arduino Uno.
+// This sketch is for a 2.4" 320x240 TFT ILI9341 display on an Arduino Uno.
 // ==========================================================================
 
 #include <Arduino.h>
@@ -141,9 +141,10 @@ void loop(void) {
 // Functions:
 
 void drawWeatherUI() {
-  tft.fillScreen(BLACK);
-  // Outline
-  tft.drawRect(0, 0, TFT_WIDTH, TFT_HEIGHT, 0xF206);
+  tft.fillScreen(BLACK); // Clear screen (Not optimal)
+
+  // Outline for centering in enclosure
+  if (DEBUG_PRINT) tft.drawRect(0, 0, TFT_WIDTH, TFT_HEIGHT, 0xF206);
 
   // Cloud Cover Symbol (dynamic)
   drawWeatherIconForCloudText();
