@@ -23,3 +23,18 @@ I wanted to make use of some old hardware that had been collecting dust in my la
 ![Rear of Device](https://github.com/jwidess/ESP-Arduino-TFT-Weather/blob/main/finished_rear.jpg?raw=true)
 
 ## Full Image Album Here: https://photos.app.goo.gl/iTXBMTu8txQHoKQs9
+
+## Home Assistant & ESPHome
+ESPHome acts as a bridge between Home Assistant and the Arduino weather display. Home Assistant gathers weather data from various sources, formats it using templates, and sends it to the ESP8266 device running ESPHome. The ESP8266 then transmits this data via UART to the Arduino, which updates the TFT display.
+
+**How it works:**
+- Home Assistant collects weather data (temperature, humidity, rain chance, condition, etc.) from multiple integrations and sensors. (These will need to be customized however you like, I've provided my `.yaml` files as examples)
+- Custom templates in `templates.yaml` format the data into a single UART payload string.
+- ESPHome receives this payload as a text sensor and sends it to the Arduino over UART every minute (and on power-up).
+- The Arduino parses the UART message and updates the display with the latest weather information.
+- Display icons and values are mapped according to the weather condition received from Home Assistant.
+- Power to the Arduino and thus display can be controlled via Home Assistant using the ESPHome switch entity. I have pin D6 (GPIO12) connected to a MOSFET to control power. Refer to [Wiring Schematics](#Wiring-Schematic)
+
+
+## Wiring Schematic:
+WIP (For now please reference images)
