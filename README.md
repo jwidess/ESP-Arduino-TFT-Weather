@@ -37,4 +37,6 @@ ESPHome acts as a bridge between Home Assistant and the Arduino weather display.
 
 
 ## Wiring Schematic:
-WIP (For now please reference images and KiCad Schematics directory)
+A screenshot of the simple wiring schematic can be found below,
+
+![Wiring Schematic Image](https://github.com/jwidess/ESP-Arduino-TFT-Weather/blob/main/Schematics/schematic_image.png?raw=true)
