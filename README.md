@@ -2,7 +2,7 @@
 This project is a simple weather display for utilizing an old MCUFRIEND_kbv 320x240 ILI9341 2.4" TFT Display shield with an Arduino Uno for display driving and an ESP8266 for data collection and Home Assistant Integration.
 
 ## Why does this exist?
-I wanted to make use of some old hardware that had been collecting dust in my lab. This old 320x240 2.4" TFT Display shield and a handful of Arduino Uno's I'd never end up using, due to todays affordability of more powerful devices, made me realize I had to find something to use these for, otherwise they where going to get e-wasted. The display shield I am using requires both an SPI connection and an 8-bit parallel connection, and if I wanted to use that along with the touchscreen and SD Card interfaces, an ESP wouldn't have enough GPIOs. On-top of this it would be a wiring nightmare! So I decided to stick with using the display shield, well as a shield, and offload the weather data acquisition to a WiFi capable device like the ESP8266. With this setup I could make use of this display, an Arduino Uno and an ESP8266, all of which are becoming fossils in this day and age.
+I wanted to make use of some old hardware that had been collecting dust in my lab. This old 320x240 2.4" TFT Display shield and a handful of Arduino Uno's I'd never end up using, due to todays affordability of more powerful devices, made me realize I had to find something to use these for, otherwise they where going to get e-wasted. The display shield I am using requires both an SPI connection and an 8-bit parallel connection, and if I wanted to use that along with the touchscreen and SD Card interfaces, an ESP wouldn't have enough GPIOs. On-top of this it would be a wiring nightmare! So I decided to stick with using the display shield, well as a shield, and offload the weather data acquisition to a WiFi capable device like the ESP8266. With this setup I could make use of this display, an Arduino Uno and an ESP8266, all of which are becoming outdated nowadays.
 
 ## Parts List:
 - **Electronics:**
@@ -10,7 +10,7 @@ I wanted to make use of some old hardware that had been collecting dust in my la
   - Arduino Uno
   - ESP8266 *(Or ESP32, really anything that runs ESPHome)*
   - [USB-C Breakout](https://www.sparkfun.com/sparkfun-usb-c-breakout.html)
-- **3D Printed Parts:** (PLA works fine)
+- **3D Printed Parts: - Checkout the Printables Model: https://www.printables.com/model/1363763-weather-display-esp-arduino-24-tft-home-assistant**
   - Enclosure Main Body
   - Top Lid
   - Bottom Lid
@@ -40,3 +40,11 @@ ESPHome acts as a bridge between Home Assistant and the Arduino weather display.
 A screenshot of the simple wiring schematic can be found below,
 
 ![Wiring Schematic Image](https://github.com/jwidess/ESP-Arduino-TFT-Weather/blob/main/Schematics/schematic_image.png?raw=true)
+
+## GrabCAD Credits:
+
+My Fusion 360 Archive file contains 3 designs from creators on GrabCAD which I used for designing the enclosure. Please check out these amazing designers at the links below!
+
+1.  [2.4" TFT Display Shield](https://grabcad.com/library/2-4-tft-display-shield-1) - Daniel Barker
+2.  [Arduino Uno R3](https://grabcad.com/library/arduino-uno-r3-1) - Andrew\_Whitham
+3.  [NodeMcu V3 ESP8266 ESP-12E Development Board Lolin](https://grabcad.com/library/nodemcu-v3-esp8266-esp-12e-development-board-lolin-1) - Enes Sert
