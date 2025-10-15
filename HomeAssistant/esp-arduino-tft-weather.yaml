@@ -22,14 +22,30 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
 
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  # Enable fallback hotspot in case wifi connection fails
   ap:
     ssid: "Esp-Arduino-Tft-Weather"
     password: "<RELPLACE_ME>"  #! Replace with your actual fallback password
 
+  # Send UART payload when WiFi connects
+  on_connect:
+    - delay: 6s # Allow time for ESP to connect and get payload from HA
+    - script.execute: send_uart_payload
+
 captive_portal:
 
-# Read the pre-formatted payload from Home Assistant as text
+#  Script to send UART payload
+script:
+  - id: send_uart_payload
+    then:
+      - uart.write:
+          id: uart_bus
+          data: !lambda |-
+            std::string s = id(uart_weather_payload).state + "\n";
+            ESP_LOGD("UART", "Sending payload: '%s'", s.c_str());
+            return std::vector<uint8_t>(s.begin(), s.end());
+
+# Read the payload from Home Assistant as text
 text_sensor:
   - platform: homeassistant
     entity_id: sensor.uart_weather_payload
@@ -51,13 +67,8 @@ switch:
     restore_mode: ALWAYS_ON # Always on after boot
     on_turn_on: # On turn on send UART payload
       then:
-        - delay: 4s # Allow time for Arduino to boot
-        - uart.write:
-            id: uart_bus
-            data: !lambda |-
-              std::string s = id(uart_weather_payload).state + "\n";
-              ESP_LOGD("UART", "Sending payload due to TFT ON: '%s'", s.c_str());
-              return std::vector<uint8_t>(s.begin(), s.end());
+        - delay: 3s # Allow time for Arduino to boot
+        - script.execute: send_uart_payload
 
 # UART setup: only TX needed
 uart:
@@ -67,18 +78,12 @@ uart:
   debug:
     direction: TX  # Log outgoing UART data for debugging
 
-# # Every minute, log and send the payload string plus newline
+# Every minute, log and send the payload string plus newline
 interval:
   - interval: 60s
     then:
       - output.turn_off: led_builtin # Active low, turn on when UART send.
-      - uart.write:
-          id: uart_bus
-          data: !lambda |-
-            // Append newline for Arduino
-            std::string s = id(uart_weather_payload).state + "\n";
-            ESP_LOGD("UART", "Sending payload: '%s'", s.c_str());
-            return std::vector<uint8_t>(s.begin(), s.end());
+      - script.execute: send_uart_payload
 
   - interval: 1s
     then:
