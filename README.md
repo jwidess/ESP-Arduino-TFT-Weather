@@ -41,6 +41,9 @@ A screenshot of the simple wiring schematic can be found below,
 
 ![Wiring Schematic Image](https://github.com/jwidess/ESP-Arduino-TFT-Weather/blob/main/Schematics/schematic_image.png?raw=true)
 
+## UI Design with [Lopaka.app](https://lopaka.app)
+The UI was designed using the fantastic [lopaka.app](https://lopaka.app) platform, I highly recommend checking it out. Mikhail has built an incredibly useful and dynamic site. 
+
 ## GrabCAD Credits:
 
 My Fusion 360 Archive file contains 3 designs from creators on GrabCAD which I used for designing the enclosure. Please check out these amazing designers at the links below!
